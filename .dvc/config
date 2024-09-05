@@ -1,3 +1,6 @@
 [core]
     analytics = false
     autostage = true
+    remote = gcs-storage
+['remote "gcs-storage"']
+    url = gs://ymx-project-1-bucket-1/data/raw
