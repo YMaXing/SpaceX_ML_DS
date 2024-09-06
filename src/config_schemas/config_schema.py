@@ -4,7 +4,9 @@ from pydantic.dataclasses import dataclass
 
 @dataclass
 class Config:
-    helle: str = "world"
+    dvc_remote_name: str = "gcs-storage"
+    dvc_remote_url: str = "gs://ymx-project-1-bucket-1/data/raw"
+    dvc_raw_data_folder: str = "data/raw"
 
 
 def setup_config() -> None:

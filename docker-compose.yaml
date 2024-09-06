@@ -4,9 +4,9 @@ services:
   app:
     user: "${USER_ID:-1000}"
     hostname: "${HOST_NAME:-YMaXing}"
-    image: SpaceX-DS-ML
+    image: spacex-ds-ml
     platform: linux/amd64
-    container_name: SpaceX-DS-ML-container
+    container_name: spacex-ds-ml-container
     build:
       context: .
       dockerfile: ./docker/Dockerfile

@@ -20,7 +20,7 @@ dask = {version = "~=2024.8.2", extras=["complete"]}
 numpy = "~=1.26.0"
 scipy = "~=1.14.1"
 statsmodels = "~=0.14.2"
-arch = "~=5.0.0"
+arch = "~=7.0.0"
 prophet = "~=1.1.5"
 nltk = "~=3.9.1"
 xgboost = "2.1.1"

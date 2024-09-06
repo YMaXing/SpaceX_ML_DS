@@ -13,7 +13,7 @@ else
 endif
 
 SERVICE_NAME = app
-CONTAINER_NAME = SpaceX-DS-ML-container
+CONTAINER_NAME = spacex-ds-ml-container
 
 DIRS_TO_VALIDATE = src test
 DOCKER_COMPOSE_RUN = $(DOCKER_COMPOSE_COMMAND) run --rm $(SERVICE_NAME)
