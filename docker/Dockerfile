@@ -49,5 +49,8 @@ USER ${USER_NAME}
 RUN git config --global user.email "yxing922@gmail.com" \
     && git config --global user.name "Yueren Xing"
 
+RUN python3.12 -m nltk.downloader stopwords && python3.12 -m nltk.downloader punkt
+
+
 COPY . /app/
 CMD ["/startup-script.sh"]

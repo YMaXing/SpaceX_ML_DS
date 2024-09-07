@@ -134,3 +134,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# credentials
+.ssh/
+
+# data
+data/

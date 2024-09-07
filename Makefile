@@ -29,6 +29,10 @@ guard-%:
 version-data: up
 	$(DOCKER_COMPOSE_EXEC) python ./src/version_data.py
 
+## Prepare and process data
+prepare-data: up
+	$(DOCKER_COMPOSE_EXEC) python ./src/prepare_data.py
+
 ## Starts jupyter lab
 notebook: up
 	$(DOCKER_COMPOSE_EXEC) jupyter-lab --ip 0.0.0.0 --port 8888 --no-browser
