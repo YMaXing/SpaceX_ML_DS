@@ -3,5 +3,4 @@ defaults:
   - dataset_reader_manager/dataset_readers@x = xdataset_reader_schema
 
 dataset_reader_manager:
-  use_dask: False
-  
+  use_dask: ${use_dask}

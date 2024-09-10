@@ -2,7 +2,9 @@ from pathlib import Path
 from pdb import run
 from shutil import rmtree
 from subprocess import CalledProcessError
-from typing import Literal
+from typing import Literal, Optional
+import dask.dataframe as dd
+import psutil
 
 from src.utils.utils import get_logger, run_shell_cmd
 
@@ -113,3 +115,45 @@ def get_raw_data_with_version(
         version, data_local_save_dir, dvc_remote_repo, dvc_data_folder, github_user_name, github_access_token
     )
     run_shell_cmd(command)
+
+
+def get_num_partition(
+    df_memory_usage: int,
+    num_worker: int,
+    available_memory: Optional[int],
+    min_partition_size: int,
+    aimed_num_partition_per_worker: int,
+) -> int:
+    if available_memory is None:
+        available_memory = psutil.virtual_memory().available
+    if df_memory_usage <= available_memory:
+        return 1
+    if df_memory_usage / num_worker <= min_partition_size:
+        return round(df_memory_usage / min_partition_size)
+    
+    num_partition_per_worker = 0
+    required_memory = float("inf")
+
+    while required_memory > available_memory:
+        num_partition_per_worker += 1
+        required_memory = df_memory_usage / num_partition_per_worker
+    
+    num_partition = num_partition_per_worker * num_worker
+
+    while (df_memory_usage / (num_partition + 1)) > min_partition_size and (num_partition // num_worker) < aimed_num_partition_per_worker:
+        num_partition += 1
+    
+    return num_partition
+
+def repartition_dataframe(
+    df: dd.core.Dataframe,
+    num_worker: int,
+    available_memory: Optional[int] = None,
+    min_partition_size: int = 15 * 1024**2,
+    aimed_num_partition_per_worker: int = 10,
+) -> dd.core.Dataframe:
+    df_memory_usage = df.memory_usage(deep=True).sum().compute()
+    num_partition = get_num_partition(df_memory_usage, num_worker, available_memory, min_partition_size, aimed_num_partition_per_worker)
+    partitioned_df = df.repartition(npartitions=1).repartition(npartitions=num_partition)
+    return partitioned_df
+

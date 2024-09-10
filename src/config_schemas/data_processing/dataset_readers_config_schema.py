@@ -11,7 +11,6 @@ class DatasetReaderConfig:
     dataset_name: str = MISSING  # Required field
     required_columns: list[str] = MISSING  # Required field
     data_format: str = MISSING  # Required field
-    use_dask: bool = MISSING  # Required field
     __target__: str = MISSING  # Required field
     split_names: list[str] = field(default_factory=lambda: ["train", "val", "test"])
 
@@ -24,7 +23,8 @@ class XDatasetReaderConfig(DatasetReaderConfig):
 @dataclass
 class DatasetReaderManagerConfig:
     dataset_readers: dict[str, DatasetReaderConfig] = MISSING
-    use_dask: bool = MISSING
+    repartition: bool = True
+    num_worker: int = 1
     __target__ = "src.data_processing.dataset_readers.DatasetReaderManager"
 
 

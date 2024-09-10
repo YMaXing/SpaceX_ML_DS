@@ -6,4 +6,4 @@ dataset_name:
 required_columns:
 split_names:
 data_format:
-use_dask:
+use_dask: ${use_dask}

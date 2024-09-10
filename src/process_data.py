@@ -1,27 +1,45 @@
 from abc import ABC, abstractmethod
+from pathlib import Path
 from re import split
 from xmlrpc.client import Boolean
 
-import dask as dd
+import dask.dataframe as dd
+from dask.distributed import Client
 import pandas as pd
 import scipy as sp
 
 from hydra.utils import instantiate
 
 from src.config_schemas.config_schema import Config
+from src.config_schemas.data_processing.dataset_cleaners_config_schema import DatasetCleanerManagerConfig
 from src.configs import dataset_reader_manager
-from src.configs import dataset_reader_manager
+from src.configs import dataset_cleaner_manager
 from src.utils.config_utils import get_config
-from src.utils.data_utils import get_raw_data_with_version
+from src.utils.data_utils import get_raw_data_with_version, repartition_dataframe
 from src.utils.gcp_utils import access_secret_version
 from src.utils.utils import get_logger
 
 
 @get_config(config_path="../configs", config_name="config")
-def prepare_data(config: Config) -> None:
-    github_access_token = access_secret_version(
-        project_id=config.infrastructure.project_id, secret_id=config.infrastructure.secret_id
-    )
+def process_data(config: Config):
+    logger = get_logger(Path(__file__).name)
+    logger.info("Processing raw data...")
+
+    if config.use_dask:
+        cluster = instantiate(config.dask_cluster)
+        client = Client(cluster)
+        try:
+            prepare_data(config)
+        finally:
+            logger.info("Closing Dask client and cluster...")
+            client.close()
+            cluster.close()
+    else:
+        prepare_data(config)
+        
+@get_config(config_path="../configs", config_name="config")
+def fetch_data(config: Config, github_access_token: str) -> None:
+    """Fetch raw data based on configuration and access token."""
     get_raw_data_with_version(
         version=config.version,
         data_local_save_dir=config.data_local_save_dir,
@@ -31,8 +49,41 @@ def prepare_data(config: Config) -> None:
         github_access_token=github_access_token,
     )
 
-    dataset_reader_manager = instantiate(config.dataset_reader_manager)
+
+def process_raw_data(df_partition: dd.core.DataFrame, dataset_cleaner_manager: DatasetCleanerManagerConfig) -> dd.core.Series:
+    return df_partition["text"].apply(dataset_cleaner_manager)
+
+@get_config(config_path="../configs", config_name="config")
+def prepare_data(config: Config) -> None:
+    github_access_token = access_secret_version(
+        project_id=config.infrastructure.project_id,
+        secret_id=config.infrastructure.secret_id
+    )
+    
+    fetch_data(config, github_access_token)
+
+    dataset_reader_manager = instantiate(config.dataset_reader_manager, use_dask=config.use_dask)
     dataset_cleaner_manager = instantiate(config.dataset_cleaner_manager)
+
+    if config.use_dask:
+        df = dataset_reader_manager.read_data(num_worker=config.dataset_reader_manager.num_worker)    
+        logger = get_logger(Path(__file__).name)
+        logger.info("Cleaning data...")
+        df = df.assign(cleaned_text=df.map_partitions(process_raw_data, dataset_cleaner_manager=dataset_cleaner_manager, meta=("text", "object")))
+        df = df.compute()
+    else:
+        df = dataset_reader_manager.read_data()
+    
+    processed_data_save_dir = Path(config.data_local_save_dir) / "processed"
+    train_parquet_path = processed_data_save_dir / "train.parquet"
+    val_parquet_path = processedjson_path = processed_data_save_dir / "val.parquet"
+    test_parquet_path = processed_data_save_dir / "test.parquet"
+
+    df.loc[df["split"] == "train"].to_parquet(train_parquet_path)
+    df.loc[df["split"] == "val"].to_parquet(val_parquet_path)
+    df.loc[df["split"] == "test"].to_parquet(test_parquet_path)
+
+    logger.info(f"Processed data saved.")
 
 
 class DatasetReader(ABC):
@@ -100,8 +151,8 @@ class XDatasetReader(DatasetReader):
         dataset_name: str,
         required_columns: list[str],
         split_names : list[str],
-        data_format: str = "csv",
-        use_dask: Boolean = False,
+        use_dask: bool,
+        data_format: str = "csv"
     ) -> None:
         super().__init__(
             dataset_dir=dataset_dir,
@@ -162,14 +213,17 @@ class XDatasetReader(DatasetReader):
 
 
 class DatasetReaderManager:
-    def __init__(self, dataset_readers: dict[str, DatasetReader], use_dask: Boolean) -> None:
+    def __init__(self, dataset_readers: dict[str, DatasetReader], use_dask: Boolean, repartition: bool = True) -> None:
         self.dataset_readers = dataset_readers
         self.use_dask = use_dask
+        self.repartition = repartition
 
-    def read_data(self):
+    def read_data(self, num_worker: int):
         dfs = [dataset_reader.read_data() for dataset_reader in self.dataset_readers.values()]
+        if self.repartition:
+            df = repartition_dataframe(df, num_worker=num_worker)
         return pd.concat(dfs, axis=0) if not self.use_dask else dd.concat(dfs, axis=0)
 
 
 if __name__ == "__main__":
-    prepare_data()  # type: ignore
+    process_data()  # type: ignore

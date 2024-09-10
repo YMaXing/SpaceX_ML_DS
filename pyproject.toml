@@ -46,6 +46,7 @@ dask-cloudprovider = {version = "2022.10", extras=["gcp"]}
 dask-ml = "~=2024.4"
 
 [tool.poetry.group.dev.dependencies]
+psutil = "~=6.0.0"
 pytest = "~=8.3.2"
 black = "~=24.8.0"
 isort = "~=5.13.2"
