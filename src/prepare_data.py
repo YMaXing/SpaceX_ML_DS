@@ -10,6 +10,7 @@ from hydra.utils import instantiate
 
 from src.config_schemas.config_schema import Config
 from src.configs import dataset_reader_manager
+from src.configs import dataset_reader_manager
 from src.utils.config_utils import get_config
 from src.utils.data_utils import get_raw_data_with_version
 from src.utils.gcp_utils import access_secret_version

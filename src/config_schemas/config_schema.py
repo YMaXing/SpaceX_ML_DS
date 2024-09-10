@@ -30,5 +30,9 @@ def setup_config() -> None:
     gcp_config_schema.setup_config()
     dataset_cleaners_config_schema.setup_config()
 
+    dataset_readers_config_schema.setup_config()
+    gcp_config_schema.setup_config()
+    dataset_cleaners_config_schema.setup_config()
+
     cs = ConfigStore.instance()
     cs.store(name="config_schema", node=Config)
