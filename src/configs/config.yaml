@@ -1,6 +1,7 @@
 defaults:
   - config_schema
-
+  - dataset_reader_manager: dataset_reader_manager
+  - dataset_cleaner_manager: dataset_cleaner_manager  
   - override hydra/job_logging: custom
   - override hydra/hydra_logging: disabled
   - _self_

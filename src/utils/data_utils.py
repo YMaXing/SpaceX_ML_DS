@@ -1,12 +1,13 @@
+from pathlib import Path
 from pdb import run
+from shutil import rmtree
 from subprocess import CalledProcessError
 from typing import Literal
-from src.utils.utils import get_logger, run_shell_cmd
-from pathlib import Path
-from shutil import rmtree
 
+from src.utils.utils import get_logger, run_shell_cmd
 
 DATA_UTILS_LOGGER = get_logger(Path(__file__).name)
+
 
 def dvc_init() -> None:
     if dvc_initialized():
@@ -20,23 +21,26 @@ def dvc_init() -> None:
     run_shell_cmd("git commit -nm 'Initialized DVC'")
     DATA_UTILS_LOGGER.info("DVC initialization complete")
 
+
 def dvc_initialized() -> bool:
     return (Path().cwd() / ".dvc").exists()
+
 
 def initialize_dvc_storage(dvc_remote_name: str, dvc_remote_url: str) -> None:
     if not run_shell_cmd("dvc remote list"):
         DATA_UTILS_LOGGER.info("Initializing DVC storage")
-        run_shell_cmd(f"dvc remote add -d {dvc_remote_name} {dvc_remote_url}")  
+        run_shell_cmd(f"dvc remote add -d {dvc_remote_name} {dvc_remote_url}")
         run_shell_cmd("git add .dvc/config")
         run_shell_cmd(f"git commit -nm 'Configured DVC remote storage at {dvc_remote_url}'")
         DATA_UTILS_LOGGER.info("DVC storage initialization complete")
     else:
         DATA_UTILS_LOGGER.info("DVC storage is already initialized")
 
+
 def make_new_data_version(dvc_raw_data_folder: str, dvc_remote_name: str) -> None:
     try:
-        status=run_shell_cmd(f"dvc status {dvc_raw_data_folder}.dvc")
-        if status=="Data and pipelines are up to date.\n":
+        status = run_shell_cmd(f"dvc status {dvc_raw_data_folder}.dvc")
+        if status == "Data and pipelines are up to date.\n":
             DATA_UTILS_LOGGER.info("Data and pipelines is already up to date")
             return
         else:
@@ -45,11 +49,11 @@ def make_new_data_version(dvc_raw_data_folder: str, dvc_remote_name: str) -> Non
         commit_to_dvc(dvc_raw_data_folder, dvc_remote_name)
 
 
-def commit_to_dvc(dvc_raw_data_folder: str, dvc_remote_name: str):
+def commit_to_dvc(dvc_raw_data_folder: str, dvc_remote_name: str) -> None:
     current_version = run_shell_cmd("git tag --list | sort -t v -k 2 -g | tail -1 | sed 's/v//'").strip()
     if not current_version:
-        current_version="0"
-    next_version=f"v{int(current_version)+1}"
+        current_version = "0"
+    next_version = f"v{int(current_version)+1}"
     run_shell_cmd(f"dvc add {dvc_raw_data_folder}")
     run_shell_cmd("git add .")
     run_shell_cmd(f"git commit -nm 'Updated version of the data from v{current_version} to v{next_version}'")
@@ -58,12 +62,15 @@ def commit_to_dvc(dvc_raw_data_folder: str, dvc_remote_name: str):
     run_shell_cmd("git push --follow-tags")
     run_shell_cmd("git push -f --tags")
 
-def get_cmd_to_get_raw_data(version: str,
-                            data_local_save_dir: str,
-                            dvc_remote_repo: str,
-                            dvc_data_folder: str,
-                            github_user_name: str,
-                            github_access_token: str) -> str:
+
+def get_cmd_to_get_raw_data(
+    version: str,
+    data_local_save_dir: str,
+    dvc_remote_repo: str,
+    dvc_data_folder: str,
+    github_user_name: str,
+    github_access_token: str,
+) -> str:
     """
     Get shell command to download raw data from dvc store
 
@@ -93,12 +100,16 @@ def get_cmd_to_get_raw_data(version: str,
     return command
 
 
-def get_raw_data_with_version(version: str,
-                              data_local_save_dir: str,
-                              dvc_remote_repo: str,
-                              dvc_data_folder: str,
-                              github_user_name: str,
-                              github_access_token: str) -> None:
+def get_raw_data_with_version(
+    version: str,
+    data_local_save_dir: str,
+    dvc_remote_repo: str,
+    dvc_data_folder: str,
+    github_user_name: str,
+    github_access_token: str,
+) -> None:
     rmtree(data_local_save_dir, ignore_errors=True)
-    command = get_cmd_to_get_raw_data(version, data_local_save_dir, dvc_remote_repo, dvc_data_folder, github_user_name, github_access_token)
+    command = get_cmd_to_get_raw_data(
+        version, data_local_save_dir, dvc_remote_repo, dvc_data_folder, github_user_name, github_access_token
+    )
     run_shell_cmd(command)

@@ -1,0 +1,9 @@
+defaults:
+  - xdataset_reader_schema
+
+dataset_dir:
+dataset_name:
+required_columns:
+split_names:
+data_format:
+use_dask:

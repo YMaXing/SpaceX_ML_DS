@@ -140,3 +140,9 @@ dmypy.json
 
 # data
 data/
+
+# NLP_preprocessing_note
+src/NLP_preprocessing.txt
+
+# notebooks
+/notebooks

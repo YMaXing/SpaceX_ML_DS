@@ -52,6 +52,13 @@ isort = "~=5.13.2"
 flake8 = "~=7.1.1"
 mypy = "~=1.11.2"
 jupyterlab = "~=4.2.5"
+types-PyYAML = "~=6.0.12.20240808"
+types-cachetools = "~=5.5.0.20240820"
+types-decorator = "~=5.1.8.20240310"
+types-protobuf = "~=5.27.0.20240907"
+types-pycurl = "~=7.45.3.20240421"
+types-requests = "~=2.32.0.20240907"
+types-six = "~=1.16.21.20240513"
 
 [build-system]
 requires = ["poetry-core"]
