@@ -33,6 +33,10 @@ version-data: up
 prepare-data: up
 	$(DOCKER_COMPOSE_EXEC) python ./src/prepare_data.py
 
+## Generate final config. CONFIG_NAME=<config_name> has to be provided. Use OVERRIDES=<overrides> for overrides
+generate-final-config: up guard-CONFIG_NAME
+	$(DOCKER_COMPOSE_EXEC) python ./src/generate_final_config.py --config-name $${CONFIG_NAME} --overrides $${OVERRIDES}
+
 ## Starts jupyter lab
 notebook: up
 	$(DOCKER_COMPOSE_EXEC) jupyter-lab --ip 0.0.0.0 --port 8888 --no-browser

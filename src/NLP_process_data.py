@@ -16,7 +16,7 @@ from src.utils.NLP_utils import SpellingCorrectionModel
 
 
 class DatasetCleaner(ABC):
-    def __call__(self, text: str | list[str]) -> str | list[str]:
+    def __call__(self, text: list[str]) -> list[str]:
         if isinstance(text, str):
             return self.clean_text(text)
         return self.clean_words(text)
@@ -141,7 +141,7 @@ class DatasetCleanerManager:
     def __init__(self, dataset_cleaners: dict[str, DatasetCleaner]) -> None:
         self.dataset_cleaners = dataset_cleaners
 
-    def __call__(self, text: str | list[str]) -> str | list[str]:
+    def __call__(self, text: list[str]) -> list[str]:
         for dataset_cleaner in self.dataset_cleaners.values():
             text = dataset_cleaner(text)
         return text

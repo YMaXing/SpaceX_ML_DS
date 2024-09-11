@@ -10,7 +10,7 @@ from pydantic.dataclasses import dataclass
 
 @dataclass
 class DatasetCleaner:
-    text: str | list[str] = MISSING  # Required field
+    text: list[str] = MISSING  # Required field
     __target__: str = MISSING
 
 
@@ -32,6 +32,7 @@ class URLRemovalDatasetCleanerConfig(DatasetCleaner):
 @dataclass
 class PunctuationDatasetCleanerConfig(DatasetCleaner):
     __target__: str = "src.NLP_process_data.PunctuationDatasetCleaner"
+    punctuation: str = field(default_factory=lambda: string.punctuation)
 
 
 @dataclass
@@ -42,7 +43,6 @@ class NonLetterDatasetCleanerConfig(DatasetCleaner):
 @dataclass
 class NewLineDatasetCleanerConfig(DatasetCleaner):
     __target__: str = "src.NLP_process_data.NewLineDatasetCleaner"
-    punctuation = field(default_factory=lambda: string.punctuation)
 
 
 @dataclass
@@ -66,13 +66,13 @@ class SpellingCorrectionModelConfig:
 
 @dataclass
 class SpellingCorrectionDatasetCleanerConfig(DatasetCleaner):
-    model: SpellingCorrectionModelConfig = SpellingCorrectionModelConfig()
-    __target__: str = "src.NLP_process_data.SpellingCorrectionDatasetCleaner"
+    model: SpellingCorrectionModelConfig = field(default_factory=lambda: SpellingCorrectionModelConfig)
+    _target_: str = "src.NLP_process_data.SpellingCorrectionDatasetCleaner"
 
 
 @dataclass
 class DatasetCleanerManagerConfig:
-    __target__: str = "src.NLP_process_data.DatasetCleanerManager"
+    _target_: str = "src.NLP_process_data.DatasetCleanerManager"
     dataset_cleaners: dict[str, DatasetCleaner] = field(default_factory=lambda: {})
 
 

@@ -11,13 +11,13 @@ class DatasetReaderConfig:
     dataset_name: str = MISSING  # Required field
     required_columns: list[str] = MISSING  # Required field
     data_format: str = MISSING  # Required field
-    __target__: str = MISSING  # Required field
+    _target_: str = MISSING  # Required field
     split_names: list[str] = field(default_factory=lambda: ["train", "val", "test"])
 
 
 @dataclass
 class XDatasetReaderConfig(DatasetReaderConfig):
-    __target__: str = "src.data_processing.dataset_readers.XDatasetReader"  # Default field
+    _target_: str = "src.data_processing.dataset_readers.XDatasetReader"  # Default field
 
 
 @dataclass
@@ -25,7 +25,7 @@ class DatasetReaderManagerConfig:
     dataset_readers: dict[str, DatasetReaderConfig] = MISSING
     repartition: bool = True
     num_worker: int = 1
-    __target__ = "src.data_processing.dataset_readers.DatasetReaderManager"
+    _target_ = "src.data_processing.dataset_readers.DatasetReaderManager"
 
 
 def setup_config() -> None:
