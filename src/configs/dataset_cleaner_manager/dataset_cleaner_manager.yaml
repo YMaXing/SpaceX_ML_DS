@@ -1,4 +1,12 @@
 defaults:
   - dataset_cleaner_manager_schema
 
-
+  - dataset_cleaners@dataset_cleaners.stopwords = stopwords_dataset_cleaner_schema
+  - dataset_cleaners@dataset_cleaners.lowercase = lowercase_dataset_cleaner_schema
+  - dataset_cleaners@dataset_cleaners.url = url_dataset_cleaner_schema
+  - dataset_cleaners@dataset_cleaners.punctuation = punctuation_dataset_cleaner_schema
+  - dataset_cleaners@dataset_cleaners.non_letter = non_letter_dataset_cleaner_schema
+  - dataset_cleaners@dataset_cleaners.newline = new_line_dataset_cleaner_schema
+  - dataset_cleaners@dataset_cleaners.non_ascii = non_ascii_dataset_cleaner_schema
+  - dataset_cleaners@dataset_cleaners.x_specific = x_specific_dataset_cleaner_schema
+  - dataset_cleaners@dataset_cleaners.spelling_correction = spelling_correction_dataset_cleaner_schema

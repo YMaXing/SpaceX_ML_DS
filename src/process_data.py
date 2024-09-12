@@ -24,8 +24,6 @@ from src.utils.utils import get_logger
 def process_data(config: Config):
     logger = get_logger(Path(__file__).name)
     logger.info("Processing raw data...")
-    print(config)
-    return
     if config.use_dask:
         cluster = instantiate(config.dask_cluster)
         client = Client(cluster)

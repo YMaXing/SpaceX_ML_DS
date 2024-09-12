@@ -29,10 +29,6 @@ class Config:
     use_dask: bool = False
 
 def setup_config() -> None:
-    dataset_readers_config_schema.setup_config()
-    gcp_config_schema.setup_config()
-    dataset_cleaners_config_schema.setup_config()
-
     gcp_config_schema.setup_config()
     dataset_readers_config_schema.setup_config()
     dataset_cleaners_config_schema.setup_config()
