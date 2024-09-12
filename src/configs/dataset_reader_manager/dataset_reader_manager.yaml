@@ -1,5 +1,5 @@
 defaults:
   - dataset_reader_manager_schema
+  - dataset_readers/x: x
 
-dataset_readers: {}
 use_dask: ${use_dask}

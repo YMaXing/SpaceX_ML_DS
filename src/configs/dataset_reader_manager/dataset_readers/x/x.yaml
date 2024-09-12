@@ -4,5 +4,4 @@ defaults:
 dataset_dir: "aa/aa"
 dataset_name: "aa"
 required_columns: ["a"]
-data_format: ["tsv"]
-use_dask: ${use_dask}
+data_format: "tsv"

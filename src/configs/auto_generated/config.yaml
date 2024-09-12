@@ -1,13 +1,50 @@
 version: v1
 dataset_reader_manager:
-  dataset_readers: {}
+  dataset_readers:
+    x:
+      dataset_dir: aa/aa
+      dataset_name: aa
+      required_columns:
+      - a
+      data_format: tsv
+      _target_: src.process_data.XDatasetReader
+      split_names:
+      - train
+      - val
+      - test
   repartition: true
   use_dask: false
   num_worker: 1
 dataset_cleaner_manager:
   _target_: src.NLP_process_data.DatasetCleanerManager
-  dataset_cleaners: {}
+  dataset_cleaners:
+    stopwords:
+      _target_: src.NLP_process_data.StopwordsDatasetCleaner
+    lowercase:
+      _target_: src.NLP_process_data.LowercaseDatasetCleaner
+    url:
+      _target_: src.NLP_process_data.URLRemovalDatasetCleaner
+    punctuation:
+      _target_: src.NLP_process_data.PunctuationDatasetCleaner
+      punctuation: '!"#$%&''()*+,-./:;<=>?@[\]^_`{|}~'
+    non_letter:
+      _target_: src.NLP_process_data.NonLetterDatasetCleaner
+    newline:
+      _target_: src.NLP_process_data.NewLineDatasetCleaner
+    non_ascii:
+      _target_: src.NLP_process_data.NonASCIIDatasetCleaner
+    x_specific:
+      _target_: src.NLP_process_data.XSpecificDatasetCleaner
+      remove_emoji: false
+    spelling_correction:
+      _target_: src.NLP_process_data.SpellingCorrectionDatasetCleaner
+      model:
+        _target_: src.NLP_process_data.SpellingCorrectionModel
+        max_dict_edit_dist: 2
+        prefix_length: 7
+        count_threshold: 1
 dask_cluster:
+  _target_: dask.distributed.LocalCluster
   n_workers: 8
   memory_limit: auto
   processes: true

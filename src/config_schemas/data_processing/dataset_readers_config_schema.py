@@ -31,5 +31,5 @@ class DatasetReaderManagerConfig:
 
 def setup_config() -> None:
     cs = ConfigStore.instance()
-    cs.store(name="xdataset_reader_schema", node=XDatasetReaderConfig, group="dataset_reader_manager/dataset_readers")
+    cs.store(name="xdataset_reader_schema", node=XDatasetReaderConfig, group="dataset_reader_manager/dataset_readers/x")
     cs.store(name="dataset_reader_manager_schema", node=DatasetReaderManagerConfig, group="dataset_reader_manager")
