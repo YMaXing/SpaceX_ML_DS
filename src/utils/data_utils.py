@@ -146,12 +146,12 @@ def get_num_partition(
     return num_partition
 
 def repartition_dataframe(
-    df: dd.core.Dataframe,
+    df: dd.core.DataFrame,
     num_worker: int,
     available_memory: Optional[int] = None,
     min_partition_size: int = 15 * 1024**2,
     aimed_num_partition_per_worker: int = 10,
-) -> dd.core.Dataframe:
+) -> dd.core.DataFrame:
     df_memory_usage = df.memory_usage(deep=True).sum().compute()
     num_partition = get_num_partition(df_memory_usage, num_worker, available_memory, min_partition_size, aimed_num_partition_per_worker)
     partitioned_df = df.repartition(npartitions=1).repartition(npartitions=num_partition)

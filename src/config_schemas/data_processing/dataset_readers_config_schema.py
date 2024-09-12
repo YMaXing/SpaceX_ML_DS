@@ -17,15 +17,16 @@ class DatasetReaderConfig:
 
 @dataclass
 class XDatasetReaderConfig(DatasetReaderConfig):
-    _target_: str = "src.data_processing.dataset_readers.XDatasetReader"  # Default field
+    _target_: str = "src.process_data.XDatasetReader"  # Default field
 
 
 @dataclass
 class DatasetReaderManagerConfig:
     dataset_readers: dict[str, DatasetReaderConfig] = MISSING
     repartition: bool = True
+    use_dask: bool = False
     num_worker: int = 1
-    _target_ = "src.data_processing.dataset_readers.DatasetReaderManager"
+    _target_ = "src.process_data.DatasetReaderManager"
 
 
 def setup_config() -> None:

@@ -1,9 +1,8 @@
 defaults:
   - xdataset_reader_schema
 
-dataset_dir:
-dataset_name:
-required_columns:
-split_names:
-data_format:
+dataset_dir: "aa/aa"
+dataset_name: "aa"
+required_columns: ["a"]
+data_format: ["tsv"]
 use_dask: ${use_dask}

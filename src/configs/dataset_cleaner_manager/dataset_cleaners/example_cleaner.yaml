@@ -1,1 +1,2 @@
 defaults:
+  - non_ascii_dataset_cleaner_schema

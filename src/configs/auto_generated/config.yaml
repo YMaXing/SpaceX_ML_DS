@@ -1,0 +1,39 @@
+version: v1
+dataset_reader_manager:
+  dataset_readers: {}
+  repartition: true
+  use_dask: false
+  num_worker: 1
+dataset_cleaner_manager:
+  _target_: src.NLP_process_data.DatasetCleanerManager
+  dataset_cleaners: {}
+dask_cluster:
+  n_workers: 8
+  memory_limit: auto
+  processes: true
+  threads_per_worker: 1
+  scheduler_port: 8786
+  silence_logs: 30
+  host: null
+  dashboard_address: :8787
+  asychronous: false
+  blocked_handlers: null
+  service_kwargs: null
+  security: null
+  protocol: null
+  interface: null
+  worker_class: null
+processed_data_save_dir: ./data/processed
+dvc_remote_name: gcs-storage
+dvc_remote_url: gs://ymx-project-1-bucket-1/data/raw
+dvc_raw_data_folder: data/raw
+data_local_save_dir: data/raw
+dvc_remote_repo: https://github.com/YMaXing/spaces_ml_ds.git
+dvc_data_folder: data/raw
+github_user_name: YMaXing
+infrastructure:
+  project_id: '966043703721'
+  secret_id: GCP-data-access-token
+  zone: us-west2-b
+  network: default
+use_dask: false

@@ -1,5 +1,5 @@
 defaults:
-  = local_dask_cluster_schema
+  - local_dask_cluster_schema
 
 n_workers: 8
   
