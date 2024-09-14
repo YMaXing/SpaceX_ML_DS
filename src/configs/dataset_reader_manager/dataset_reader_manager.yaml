@@ -2,4 +2,6 @@ defaults:
   - dataset_reader_manager_schema
   - dataset_readers/x: x
 
+available_memory: null
+
 use_dask: ${use_dask}

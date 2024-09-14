@@ -15,5 +15,5 @@ hydra:
 version: v1
 
 use_dask: false
-
-processed_data_save_dir: ./data/processed
+run_tag: test_run
+processed_data_save_dir: gs://ymx-project-1-bucket-1/data/processed/$(run_tag)

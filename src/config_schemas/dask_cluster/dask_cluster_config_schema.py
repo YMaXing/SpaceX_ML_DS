@@ -1,13 +1,12 @@
 from asyncio import threads
-from dataclasses import MISSING, field
+from dataclasses import dataclass, MISSING, field
 from importlib.metadata import files
 from sched import scheduler
 from string import punctuation
-from typing import Optional, Protocol
+from typing import Optional, Protocol, Any
 from omegaconf import SI
 
 from hydra.core.config_store import ConfigStore
-from pydantic.dataclasses import dataclass
 
 @dataclass
 class WorkerClassConfig:
@@ -38,7 +37,7 @@ class LocalDaskClusterConfig(DaskClusterConfig):
 
 @dataclass
 class GCPDaskClusterConfig(DaskClusterConfig):
-    _target_ = "dask_cloudprovider.gcp.GCPCluster"
+    _target_: str= "dask_cloudprovider.gcp.GCPCluster"
     project_id: str = SI("$(infrastructure.project_id)")
     zone : str = SI("$(infrastructure.zone)")
     network: str = SI("$(infrastructure.network)")
@@ -56,6 +55,7 @@ class GCPDaskClusterConfig(DaskClusterConfig):
 
     n_workers: int = 0
     worker_class: str = "dask.distributed.Nanny"
+    worker_options: dict[str, Any] = field(default_factory=lambda: {})
     env_vars: dict[str, str] = field(default_factory=lambda: {})
     scheduler_options: dict[str, str] = field(default_factory=lambda: {})
     silence_logs: Optional[bool] = None

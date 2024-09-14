@@ -6,7 +6,10 @@ from typing import Literal, Optional
 import dask.dataframe as dd
 import psutil
 
+from dvc.api import get_url
+
 from src.utils.utils import get_logger, run_shell_cmd
+from src.utils.gcp_utils import access_secret_version
 
 DATA_UTILS_LOGGER = get_logger(Path(__file__).name)
 
@@ -96,7 +99,8 @@ def get_cmd_to_get_raw_data(
     str
         shell command to download raw data from dvc store
     """
-    dvc_remote_repo = f"https://{github_user_name}:{github_access_token}@{dvc_remote_repo}"
+    without_https = dvc_remote_repo.replace("https://", "")
+    dvc_remote_repo = f"https://{github_user_name}:{github_access_token}@{without_https}"
     command = f"dvc get {dvc_remote_repo} {dvc_data_folder} --rev {version} -o {data_local_save_dir}"
 
     return command
@@ -120,7 +124,7 @@ def get_raw_data_with_version(
 def get_num_partition(
     df_memory_usage: int,
     num_worker: int,
-    available_memory: Optional[int],
+    available_memory: Optional[float],
     min_partition_size: int,
     aimed_num_partition_per_worker: int,
 ) -> int:
@@ -148,7 +152,7 @@ def get_num_partition(
 def repartition_dataframe(
     df: dd.core.DataFrame,
     num_worker: int,
-    available_memory: Optional[int] = None,
+    available_memory: Optional[float] = None,
     min_partition_size: int = 15 * 1024**2,
     aimed_num_partition_per_worker: int = 10,
 ) -> dd.core.DataFrame:
@@ -157,3 +161,7 @@ def repartition_dataframe(
     partitioned_df = df.repartition(npartitions=1).repartition(npartitions=num_partition)
     return partitioned_df
 
+def get_repo_url_with_access_token(gcp_project_id: str, gcp_secret_id: str, repo_address: str, user_name: str) -> str:
+    access_token = access_secret_version(gcp_project_id, gcp_secret_id)
+    repo_address = repo_address.replace("https://", "")
+    return f"https://{user_name}:{access_token}@{repo_address}"

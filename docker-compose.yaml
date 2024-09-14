@@ -5,6 +5,8 @@ services:
     image: spacex-ds-ml
     platform: linux/amd64
     container_name: spacex-ds-ml-container
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=./credentials/meta-sensor-434006-j6-19a2cb0d9661.json
     build:
       context: .
       dockerfile: ./docker/Dockerfile

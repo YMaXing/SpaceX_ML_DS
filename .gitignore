@@ -137,6 +137,7 @@ dmypy.json
 
 # credentials
 .ssh/
+credentials/
 
 # data
 data/
@@ -145,4 +146,4 @@ data/
 src/NLP_preprocessing.txt
 
 # notebooks
-/notebooks
+notebooks/

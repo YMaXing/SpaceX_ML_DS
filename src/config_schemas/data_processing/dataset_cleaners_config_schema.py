@@ -14,49 +14,49 @@ class DatasetCleanerConfig:
 
 @dataclass
 class StopwordsDatasetCleanerConfig(DatasetCleanerConfig):
-    _target_: str = "src.NLP_process_data.StopwordsDatasetCleaner"
+    _target_: str = "src.data_processing.NLP_process_data.StopwordsDatasetCleaner"
 
 
 @dataclass
 class LowercaseDatasetCleanerConfig(DatasetCleanerConfig):
-    _target_: str = "src.NLP_process_data.LowercaseDatasetCleaner"
+    _target_: str = "src.data_processing.NLP_process_data.LowercaseDatasetCleaner"
 
 
 @dataclass
 class URLRemovalDatasetCleanerConfig(DatasetCleanerConfig):
-    _target_: str = "src.NLP_process_data.URLRemovalDatasetCleaner"
+    _target_: str = "src.data_processing.NLP_process_data.URLRemovalDatasetCleaner"
 
 
 @dataclass
 class PunctuationDatasetCleanerConfig(DatasetCleanerConfig):
-    _target_: str = "src.NLP_process_data.PunctuationDatasetCleaner"
+    _target_: str = "src.data_processing.NLP_process_data.PunctuationDatasetCleaner"
     punctuation: str = field(default_factory=lambda: string.punctuation)
 
 
 @dataclass
 class NonLetterDatasetCleanerConfig(DatasetCleanerConfig):
-    _target_: str = "src.NLP_process_data.NonLetterDatasetCleaner"
+    _target_: str = "src.data_processing.NLP_process_data.NonLetterDatasetCleaner"
 
 
 @dataclass
 class NewLineDatasetCleanerConfig(DatasetCleanerConfig):
-    _target_: str = "src.NLP_process_data.NewLineDatasetCleaner"
+    _target_: str = "src.data_processing.NLP_process_data.NewLineDatasetCleaner"
 
 
 @dataclass
 class NonASCIIDatasetCleanerConfig(DatasetCleanerConfig):
-    _target_: str = "src.NLP_process_data.NonASCIIDatasetCleaner"
+    _target_: str = "src.data_processing.NLP_process_data.NonASCIIDatasetCleaner"
 
 
 @dataclass
 class XSpecificDatasetCleanerConfig(DatasetCleanerConfig):
     remove_emoji: bool = False
-    _target_: str = "src.NLP_process_data.XSpecificDatasetCleaner"
+    _target_: str = "src.data_processing.NLP_process_data.XSpecificDatasetCleaner"
 
 
 @dataclass
 class SpellingCorrectionModelConfig:
-    _target_: str = "src.NLP_process_data.SpellingCorrectionModel"
+    _target_: str = "src.data_processing.NLP_process_data.SpellingCorrectionModel"
     max_dict_edit_dist: int = 2
     prefix_length: int = 7
     count_threshold: int = 1
@@ -65,12 +65,12 @@ class SpellingCorrectionModelConfig:
 @dataclass
 class SpellingCorrectionDatasetCleanerConfig(DatasetCleanerConfig):
     model: SpellingCorrectionModelConfig = field(default_factory=lambda: SpellingCorrectionModelConfig)
-    _target_: str = "src.NLP_process_data.SpellingCorrectionDatasetCleaner"
+    _target_: str = "src.data_processing.NLP_process_data.SpellingCorrectionDatasetCleaner"
 
 
 @dataclass
 class DatasetCleanerManagerConfig:
-    _target_: str = "src.NLP_process_data.DatasetCleanerManager"
+    _target_: str = "src.data_processing.NLP_process_data.DatasetCleanerManager"
     dataset_cleaners: dict[str, DatasetCleanerConfig] = field(default_factory=lambda: {})
 
 

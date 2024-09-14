@@ -1,0 +1,5 @@
+defaults:
+  - override /dask_cluster: local_dask_cluster 
+
+data_reader_manager:
+  available_memory: null

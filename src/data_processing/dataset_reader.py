@@ -1,88 +1,13 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from re import split
-from xmlrpc.client import Boolean
 
 import dask.dataframe as dd
-from dask.distributed import Client
 import pandas as pd
-import scipy as sp
+from dvc.api import get_url
+from typing import Optional 
 
-from hydra.utils import instantiate
-
-from src.config_schemas.config_schema import Config
-from src.config_schemas.data_processing.dataset_cleaners_config_schema import DatasetCleanerManagerConfig
-from src.configs import dataset_reader_manager
-from src.configs import dataset_cleaner_manager
-from src.utils.config_utils import get_config
-from src.utils.data_utils import get_raw_data_with_version, repartition_dataframe
-from src.utils.gcp_utils import access_secret_version
+from src.utils.data_utils import repartition_dataframe, get_repo_url_with_access_token
 from src.utils.utils import get_logger
-
-
-@get_config(config_path="../configs", config_name="config")
-def process_data(config: Config):
-    logger = get_logger(Path(__file__).name)
-    logger.info("Processing raw data...")
-    if config.use_dask:
-        cluster = instantiate(config.dask_cluster)
-        client = Client(cluster)
-        try:
-            prepare_data(config)
-        finally:
-            logger.info("Closing Dask client and cluster...")
-            client.close()
-            cluster.close()
-    else:
-        prepare_data(config)
-        
-@get_config(config_path="../configs", config_name="config")
-def fetch_data(config: Config, github_access_token: str) -> None:
-    """Fetch raw data based on configuration and access token."""
-    get_raw_data_with_version(
-        version=config.version,
-        data_local_save_dir=config.data_local_save_dir,
-        dvc_remote_repo=config.dvc_remote_repo,
-        dvc_data_folder=config.dvc_data_folder,
-        github_user_name=config.github_user_name,
-        github_access_token=github_access_token,
-    )
-
-
-def process_raw_data(df_partition: dd.core.DataFrame, dataset_cleaner_manager: DatasetCleanerManagerConfig) -> dd.core.Series:
-    return df_partition["text"].apply(dataset_cleaner_manager)
-
-@get_config(config_path="../configs", config_name="config")
-def prepare_data(config: Config) -> None:
-    github_access_token = access_secret_version(
-        project_id=config.infrastructure.project_id,
-        secret_id=config.infrastructure.secret_id
-    )
-    
-    fetch_data(config, github_access_token)
-
-    dataset_reader_manager = instantiate(config.dataset_reader_manager, use_dask=config.use_dask)
-    dataset_cleaner_manager = instantiate(config.dataset_cleaner_manager)
-
-    if config.use_dask:
-        df = dataset_reader_manager.read_data(num_worker=config.dataset_reader_manager.num_worker)    
-        logger = get_logger(Path(__file__).name)
-        logger.info("Cleaning data...")
-        df = df.assign(cleaned_text=df.map_partitions(process_raw_data, dataset_cleaner_manager=dataset_cleaner_manager, meta=("text", "object")))
-        df = df.compute()
-    else:
-        df = dataset_reader_manager.read_data()
-    
-    processed_data_save_dir = Path(config.data_local_save_dir) / "processed"
-    train_parquet_path = processed_data_save_dir / "train.parquet"
-    val_parquet_path = processedjson_path = processed_data_save_dir / "val.parquet"
-    test_parquet_path = processed_data_save_dir / "test.parquet"
-
-    df.loc[df["split"] == "train"].to_parquet(train_parquet_path)
-    df.loc[df["split"] == "val"].to_parquet(val_parquet_path)
-    df.loc[df["split"] == "test"].to_parquet(test_parquet_path)
-
-    logger.info(f"Processed data saved.")
 
 
 class DatasetReader(ABC):
@@ -93,7 +18,12 @@ class DatasetReader(ABC):
         required_columns: list[str],
         split_names: list[str],
         data_format: str,
-        use_dask: Boolean,
+        use_dask: bool,
+        gcp_project_id: str,
+        gcp_github_access_token_secret_id: str,
+        dvc_remote_repo: str,
+        github_user_name: str,
+        version: str,
     ) -> None:
         super().__init__()
         self.split_names = split_names
@@ -102,6 +32,8 @@ class DatasetReader(ABC):
         self.required_columns = required_columns
         self.data_format = data_format
         self.use_dask = use_dask
+        self.version = version
+        self.dvc_remote_repo = get_repo_url_with_access_token(gcp_project_id, gcp_github_access_token_secret_id, dvc_remote_repo, github_user_name)
         self.logger = get_logger(self.__class__.__name__)
 
     def read_data(self) -> pd.DataFrame | dd.core.DataFrame:
@@ -141,6 +73,9 @@ class DatasetReader(ABC):
             else dd.concat([df_train, df_val, df_test], axis=0)
         )
         return df
+    
+    def get_remote_data_url(self, dataset_path: str) -> str:
+        return get_url(path=dataset_path, repo=self.dvc_remote_repo, ref=self.version)
 
 
 class XDatasetReader(DatasetReader):
@@ -151,10 +86,20 @@ class XDatasetReader(DatasetReader):
         required_columns: list[str],
         split_names : list[str],
         use_dask: bool,
+        gcp_project_id: str,
+        gcp_github_access_token_secret_id: str,
+        dvc_remote_repo: str,
+        github_user_name: str,
+        version: str,
         data_format: str = "csv"
     ) -> None:
         super().__init__(
             dataset_dir=dataset_dir,
+            dataset_name=dataset_name,
+            gcp_github_access_token_secret_id="github_access_token",
+            dvc_remote_repo=dvc_remote_repo,
+            github_user_name=github_user_name,
+            version=version,
             required_columns=required_columns,
             split_names=split_names,
             data_format=data_format,
@@ -177,15 +122,22 @@ class XDatasetReader(DatasetReader):
 
         # Use the appropriate reader function based on the data format
         read_func = readers.get(self.data_format)
-
         if read_func:
-            df_train = read_func(f"{self.dataset_dir}/{self.dataset_name}_train.{self.data_format}")
-            df_val = read_func(f"{self.dataset_dir}/{self.dataset_name}_val.{self.data_format}")
-            df_test = read_func(f"{self.dataset_dir}/{self.dataset_name}_test.{self.data_format}")
+            train_path = f"{self.dataset_dir}/{self.dataset_name}_train.{self.data_format}"
+            val_path = f"{self.dataset_dir}/{self.dataset_name}_val.{self.data_format}"
+            test_path = f"{self.dataset_dir}/{self.dataset_name}_test.{self.data_format}"
+
+            train_url = self.get_remote_data_url(train_path)
+            val_url = self.get_remote_data_url(val_path)
+            test_url = self.get_remote_data_url(test_path)
+
+            df_train = read_func(train_url)
+            df_val = read_func(val_url)
+            df_test = read_func(test_url)
         else:
             raise ValueError(f"Unsupported data format: {self.data_format}")
 
-        return super()._read_data_pd()
+        return df_train, df_val, df_test
 
     def _read_data_dd(self) -> tuple[dd.core.DataFrame, dd.core.DataFrame, dd.core.DataFrame]:
         self.logger.info("Reading X(Twitter) data using Dask.")
@@ -202,27 +154,32 @@ class XDatasetReader(DatasetReader):
         read_func = readers.get(self.data_format)
 
         if read_func:
-            df_train = read_func(f"{self.dataset_dir}/{self.dataset_name}_train.{self.data_format}")
-            df_val = read_func(f"{self.dataset_dir}/{self.dataset_name}_val.{self.data_format}")
-            df_test = read_func(f"{self.dataset_dir}/{self.dataset_name}_test.{self.data_format}")
+            train_path = f"{self.dataset_dir}/{self.dataset_name}_train.{self.data_format}"
+            val_path = f"{self.dataset_dir}/{self.dataset_name}_val.{self.data_format}"
+            test_path = f"{self.dataset_dir}/{self.dataset_name}_test.{self.data_format}"
+
+            train_url = self.get_remote_data_url(train_path)
+            val_url = self.get_remote_data_url(val_path)
+            test_url = self.get_remote_data_url(test_path)
+
+            df_train = read_func(train_url)
+            df_val = read_func(val_url)
+            df_test = read_func(test_url)
         else:
             raise ValueError(f"Unsupported data format: {self.data_format}")
 
-        return super()._read_data_dd()
+        return df_train, df_val, df_test
 
 
 class DatasetReaderManager:
-    def __init__(self, dataset_readers: dict[str, DatasetReader], use_dask: Boolean, repartition: bool = True) -> None:
+    def __init__(self, dataset_readers: dict[str, DatasetReader], use_dask: bool, repartition: bool = True, available_memory: Optional[float] = None) -> None:
         self.dataset_readers = dataset_readers
         self.use_dask = use_dask
         self.repartition = repartition
+        self.available_memory = available_memory 
 
     def read_data(self, num_worker: int):
         dfs = [dataset_reader.read_data() for dataset_reader in self.dataset_readers.values()]
         if self.repartition:
-            df = repartition_dataframe(df, num_worker=num_worker)
+            df = repartition_dataframe(df, num_worker=num_worker, available_memory=self.available_memory)
         return pd.concat(dfs, axis=0) if not self.use_dask else dd.concat(dfs, axis=0)
-
-
-if __name__ == "__main__":
-    process_data()  # type: ignore
