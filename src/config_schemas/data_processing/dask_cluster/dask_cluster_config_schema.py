@@ -69,5 +69,3 @@ def setup_config() -> None:
     cs=ConfigStore.instance()
     cs.store(name="local_dask_cluster_schema", node=LocalDaskClusterConfig, group="dask_cluster")
     cs.store(name="gcp_dask_cluster_schema", node=GCPDaskClusterConfig, group="dask_cluster")
-
-

@@ -17,7 +17,7 @@ from hydra.types import TaskFunction
 from omegaconf import DictConfig, OmegaConf
 from io import StringIO, BytesIO
 
-from src.config_schemas import config_schema
+from src.config_schemas.data_processing import data_processing_config_schema
 from src.utils.io_utils import open_file
 
 
@@ -52,7 +52,7 @@ def get_pickle_config(config_path: str, config_name: str) -> Any:
     return main_decorator
 
 def setup_config() -> None:
-    config_schema.setup_config()
+    data_processing_config_schema.setup_config()
 
 
 def setup_logger() -> None:

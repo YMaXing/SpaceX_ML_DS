@@ -31,7 +31,7 @@ guard-%:
 
 ## Version data
 version-data: up
-	$(DOCKER_COMPOSE_EXEC) python ./src/version_data.py
+	$(DOCKER_COMPOSE_EXEC) python ./src/data_processing/version_data.py
 
 ## Generate final config. CONFIG_NAME=<config_name> has to be provided. Use OVERRIDES=<overrides> for overrides
 generate-final-config: up guard-CONFIG_NAME
@@ -39,7 +39,14 @@ generate-final-config: up guard-CONFIG_NAME
 
 ## Generate final config for data processing. Use OVERRIDES=<overrides> for overrides
 generate-final-data-processing-config: up
-	$(DOCKER_COMPOSE_EXEC) python ./src/generate_final_config.py --config-name config --overrides docker_image_name=$(GCP_DOCKER_IMAGE_NAME) docker_image_tag=$(GCP_DOCKER_IMAGE_TAG) $${OVERRIDES}
+	$(DOCKER_COMPOSE_EXEC) python ./src/generate_final_config.py \
+	--config-path "../configs/data_processing" \
+	--config-name data_processing_config \
+	--overrides docker_image_name=$(GCP_DOCKER_IMAGE_NAME) docker_image_tag=$(GCP_DOCKER_IMAGE_TAG) $${OVERRIDES}
+
+## Generate final config for tokenizer training. Use OVERRIDES=<overrides> for overrides
+generate-final-tokenizer-training-config: up
+	$(DOCKER_COMPOSE_EXEC) python ./src/generate_final_config.py --config-name tokenizer_training_config --overrides docker_image_name=$(GCP_DOCKER_IMAGE_NAME) docker_image_tag=$(GCP_DOCKER_IMAGE_TAG) $${OVERRIDES}
 
 ## Prepare and process data, but not push to GCP artifact registry
 local-process-data: generate-final-data-processing-config

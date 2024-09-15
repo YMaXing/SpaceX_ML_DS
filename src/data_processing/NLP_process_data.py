@@ -10,7 +10,7 @@ from xmlrpc.client import Boolean
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
-from src.config_schemas.config_schema import Config
+from src.config_schemas.data_processing.data_processing_config_schema import Config
 from src.utils.config_utils import get_config
 from src.utils.NLP_utils import SpellingCorrectionModel
 

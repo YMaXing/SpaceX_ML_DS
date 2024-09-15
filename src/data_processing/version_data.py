@@ -1,7 +1,7 @@
 from pathlib import Path
 from venv import logger
 
-from src.config_schemas.config_schema import Config
+from src.config_schemas.data_processing.data_processing_config_schema import Config
 from src.utils.config_utils import get_config
 from src.utils.data_utils import dvc_init, initialize_dvc_storage, make_new_data_version
 from src.utils.utils import get_logger

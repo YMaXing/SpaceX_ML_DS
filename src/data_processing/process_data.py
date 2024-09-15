@@ -1,4 +1,3 @@
-from os import write
 from pathlib import Path
 
 import dask.dataframe as dd
@@ -7,15 +6,15 @@ import pandas as pd
 
 from hydra.utils import instantiate
 
-from src.config_schemas.config_schema import Config
+from src.config_schemas.data_processing.data_processing_config_schema import DataProcessingConfig
 from src.config_schemas.data_processing.dataset_cleaners_config_schema import DatasetCleanerManagerConfig
 from src.utils.config_utils import get_config, get_pickle_config, custom_instantiate
 from src.utils.io_utils import write_yaml
 from src.utils.utils import get_logger
 
 
-@get_config(config_path="../configs/auto_generated", config_name="config")
-def process_data(config: Config):
+@get_config(config_path="../configs/auto_generated", config_name="data_processing_config")
+def process_data(config: DataProcessingConfig):
     logger = get_logger(Path(__file__).name)
     logger.info("Processing raw data...")
     if config.use_dask:
@@ -34,8 +33,8 @@ def process_data(config: Config):
 def process_raw_data(df_partition: dd.core.DataFrame, dataset_cleaner_manager: DatasetCleanerManagerConfig) -> dd.core.Series:
     return df_partition["text"].apply(dataset_cleaner_manager)
 
-@get_config(config_path="../configs", config_name="config")
-def prepare_data(config: Config) -> None:
+@get_config(config_path="../configs/auto_generated", config_name="data_processing_config")
+def prepare_data(config: DataProcessingConfig) -> None:
 
     dataset_reader_manager = instantiate(config.dataset_reader_manager, use_dask=config.use_dask)
     dataset_cleaner_manager = instantiate(config.dataset_cleaner_manager)

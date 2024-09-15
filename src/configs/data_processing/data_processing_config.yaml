@@ -1,0 +1,13 @@
+defaults:
+  - data_processing_config_schema
+  - dataset_reader_manager: dataset_reader_manager
+  - dataset_cleaner_manager: dataset_cleaner_manager
+  - dask_cluster: local_dask_cluster
+  - _self_
+
+
+version: v1
+
+use_dask: false
+run_tag: test_run
+processed_data_save_dir: gs://ymx-project-1-bucket-1/data/processed/$(run_tag)
