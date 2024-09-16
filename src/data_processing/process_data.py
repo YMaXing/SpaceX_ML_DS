@@ -47,10 +47,11 @@ def prepare_data(config: DataProcessingConfig) -> None:
         df = df.compute()
     else:
         df = dataset_reader_manager.read_data()
+        df = df.assign(cleaned_text=df["text"].apply(dataset_cleaner_manager))
     
     processed_data_save_dir = Path(config.data_local_save_dir) / "processed"
     train_parquet_path = processed_data_save_dir / "train.parquet"
-    val_parquet_path = processedjson_path = processed_data_save_dir / "val.parquet"
+    val_parquet_path = processed_data_save_dir / "val.parquet"
     test_parquet_path = processed_data_save_dir / "test.parquet"
 
     df.loc[df["split"] == "train"].to_parquet(train_parquet_path)
