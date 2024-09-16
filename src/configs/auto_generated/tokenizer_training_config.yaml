@@ -1,0 +1,7 @@
+docker_image_name: us-west2-docker.pkg.dev/YMaXing/spacex-ds-ml
+docker_image_tag: a8b518e4-a7a1-47a6-88b3-a6370efa93db
+infrastructure:
+  project_id: '966043703721'
+  secret_id: GCP-data-access-token
+  zone: us-west2-b
+  network: default
