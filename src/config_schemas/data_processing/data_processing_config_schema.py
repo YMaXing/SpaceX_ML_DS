@@ -1,5 +1,5 @@
-from dataclasses import MISSING, dataclass, field
-
+from dataclasses import dataclass, field
+from omegaconf import MISSING
 from hydra.core.config_store import ConfigStore
 
 from src.config_schemas.data_processing import dataset_cleaners_config_schema, dataset_readers_config_schema

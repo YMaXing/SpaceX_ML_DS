@@ -1,12 +1,9 @@
 import string
-
-from cgitb import text
-from dataclasses import MISSING, field
+from dataclasses import dataclass, field
 from string import punctuation
 
 from hydra.core.config_store import ConfigStore
-from pydantic.dataclasses import dataclass
-
+from omegaconf import MISSING
 
 @dataclass
 class DatasetCleanerConfig:

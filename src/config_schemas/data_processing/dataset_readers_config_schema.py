@@ -1,5 +1,5 @@
-from dataclasses import dataclass, MISSING, field
-from omegaconf import SI
+from dataclasses import dataclass, field
+from omegaconf import SI, MISSING
 
 from hydra.core.config_store import ConfigStore
 from pydantic.dataclasses import dataclass

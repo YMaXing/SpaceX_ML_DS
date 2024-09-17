@@ -1,10 +1,8 @@
-from asyncio import threads
-from dataclasses import dataclass, MISSING, field
+from dataclasses import dataclass, field
 from importlib.metadata import files
-from sched import scheduler
 from string import punctuation
 from typing import Optional, Protocol, Any
-from omegaconf import SI
+from omegaconf import SI, MISSING
 
 from hydra.core.config_store import ConfigStore
 

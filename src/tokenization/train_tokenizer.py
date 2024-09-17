@@ -5,7 +5,7 @@ import pandas as pd
 
 from hydra.utils import instantiate
 
-from src.config_schemas.tokenization.train_tokenizer_config_schema import TokenizerTrainingConfig
+from src.config_schemas.tokenization.tokenizer_training_config_schema import TokenizerTrainingConfig
 from src.tokenization import tokenizer
 from src.utils.config_utils import get_config, get_pickle_config, custom_instantiate
 from src.utils.io_utils import write_yaml

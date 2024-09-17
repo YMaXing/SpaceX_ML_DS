@@ -18,7 +18,7 @@ from omegaconf import DictConfig, OmegaConf
 from io import StringIO, BytesIO
 
 from src.config_schemas.data_processing import data_processing_config_schema
-from src.config_schemas.tokenizer_training import train_tokenizer_config_schema
+from src.config_schemas.tokenization import tokenizer_training_config_schema, tokenizer_config_schema
 from src.utils.io_utils import open_file
 
 
@@ -54,8 +54,8 @@ def get_pickle_config(config_path: str, config_name: str) -> Any:
 
 def setup_config() -> None:
     data_processing_config_schema.setup_config()
-    train_tokenizer_config_schema.setup_config()
-
+    tokenizer_training_config_schema.setup_config()
+    tokenizer_config_schema.setup_config()
 
 def setup_logger() -> None:
     with open("./src/configs/hydra/job_logging/custom.yaml", "r") as stream:
