@@ -71,47 +71,47 @@ def setup_config():
 
     cs.store(name="bert_normalizer_schema",
                 node=BertNormalizerConfig,
-                group="normalizers")
+                group="tokenizer/nomalizer")
     
     cs.store(name="lowercase_normalizer_schema",
                 node=LowercaseNormalizerConfig,
-                group="normalizers")
+                group="tokenizer/nomalizer")
     
     cs.store(name="nfkd_normalizer_schema",
                 node=NFKDNormalizerConfig,
-                group="normalizers")
+                group="tokenizer/nomalizer")
     
     cs.store(name="nfc_normalizer_schema",
                 node=NFCNormalizerConfig,
-                group="normalizers")
+                group="tokenizer/nomalizer")
     
     cs.store(name="nfd_normalizer_schema",
                 node=NFDNormalizerConfig,
-                group="normalizers")
+                group="tokenizer/nomalizer")
     
     cs.store(name="nfkc_normalizer_schema",
                 node=NFKCNormalizerConfig,
-                group="normalizers")
+                group="tokenizer/nomalizer")
     
     cs.store(name="nmt_normalizer_schema",
                 node=NmtNormalizerConfig,
-                group="normalizers")
+                group="tokenizer/nomalizer")
     
     cs.store(name="replace_normalizer_schema",
                 node=ReplaceNormalizerConfig,
-                group="normalizers")
+                group="tokenizer/nomalizer")
     
     cs.store(name="sequence_normalizer_schema",
                 node=SequenceNormalizerConfig,
-                group="normalizers")
+                group="tokenizer/nomalizer")
     
     cs.store(name="strip_normalizer_schema",
                 node=StripNormalizerConfig,
-                group="normalizers")
+                group="tokenizer/nomalizer")
     
     cs.store(name="strip_accents_normalizer_schema",
                 node=StripAccentsNormalizerConfig,
-                group="normalizers")
+                group="tokenizer/nomalizer")
     
     
     

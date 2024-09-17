@@ -14,13 +14,14 @@ from src.utils.utils import get_logger
 
 @get_config(config_path="../configs/auto_generated", config_name="tokenizer_training_config")
 def train_tokenizer(config: TokenizerTrainingConfig):
+    
     logger = get_logger(Path(__file__).name)
     logger.info("Training tokenizer...")
 
     data_parquet_path = config.data_parquet_path
     text_column_name = config.text_column_name
 
-    tokenizer = instantiate(config.tokenizer)
+    tokenizer = instantiate(config.tokenizer, _convert_="all")
 
     logger.info("Reading data...")
     df = pd.read_parquet(data_parquet_path)

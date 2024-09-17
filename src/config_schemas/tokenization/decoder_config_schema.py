@@ -48,23 +48,23 @@ def setup_config() -> None:
 
     cs.store(name="bpe_decoder_schema", 
              node=BPEDecoderConfig,
-             group="decoder")
+             group="tokenizer/decoder")
     
     cs.store(name="byte_level_bpe_decoder_schema",
             node=ByteLevelDecoderConfig,
-            group="decoder")
+            group="tokenizer/decoder")
     
     cs.store(name="ctc_decoder_schema",
             node=CTCDecoderConfig,
-            group="decoder")
+            group="tokenizer/decoder")
     
     cs.store(name="metaspace_decoder_schema",
             node=MetaspaceDecoderConfig,
-            group="decoder")
+            group="tokenizer/decoder")
     
     cs.store(name="word_piece_decoder_schema",
             node=WordPieceDecoderConfig,
-            group="decoder")
+            group="tokenizer/decoder")
     
-    cs.store(name="decoder_schema",
+    cs.store(name="tokenizer/decoder_schema",
             node=DecoderConfig)

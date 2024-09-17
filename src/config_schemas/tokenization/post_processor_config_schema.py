@@ -35,16 +35,16 @@ def setup_config() -> None:
 
     cs.store(name="bert_post_processor_schema", 
              node=BertPostProcessorConfig,
-             group="post_processors")
+             group="tokenizer/post_processor")
       
     cs.store(name="post_processor_schema", 
              node=PostProcessorConfig,
-             group="post_processors")
+             group="tokenizer/post_processor")
     
     cs.store(name="byte_level_post_processor_schema",
                 node=ByteLevelPostProcessorConfig,
-                group="post_processors")
+                group="tokenizer/post_processor")
     
     cs.store(name="roberta_post_processor_schema",
                 node=RobertaPostProcessorConfig,
-                group="post_processors")
+                group="tokenizer/post_processor")

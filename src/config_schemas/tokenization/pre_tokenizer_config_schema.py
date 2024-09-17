@@ -82,44 +82,44 @@ def setup_config() -> None:
 
     cs.store(name="bert_pre_tokenizer_schema", 
              node=BertPreTokenizerConfig,
-             group="pre_tokenizers")
+             group="tokenizer/pre_tokenizer")
     
     cs.store(name="byte_level_pre_tokenizer_schema",
                 node=ByteLevelPreTokenizerConfig,
-                group="pre_tokenizers")
+                group="tokenizer/pre_tokenizer")
     
     cs.store(name="char_delimiter_split_pre_tokenizer_schema",
                 node=CharDelimiterSplitPreTokenizerConfig,
-                group="pre_tokenizers")
+                group="tokenizer/pre_tokenizer")
     
     cs.store(name="digits_pre_tokenizer_schema",
                 node=DigitsPreTokenizerConfig,
-                group="pre_tokenizers")
+                group="tokenizer/pre_tokenizer")
     
     cs.store(name="metaspace_pre_tokenizer_schema",
                 node=MetaspacePreTokenizerConfig,
-                group="pre_tokenizers")
+                group="tokenizer/pre_tokenizer")
     
     cs.store(name="punctuation_pre_tokenizer_schema",
                 node=PunctuationPreTokenizerConfig,
-                group="pre_tokenizers")
+                group="tokenizer/pre_tokenizer")
     
     cs.store(name="sequence_pre_tokenizer_schema",
                 node=SequencePreTokenizerConfig,
-                group="pre_tokenizers")
+                group="tokenizer/pre_tokenizer")
     
     cs.store(name="split_pre_tokenizer_schema",
                 node=SplitPreTokenizerConfig,
-                group="pre_tokenizers")
+                group="tokenizer/pre_tokenizer")
     
     cs.store(name="unicode_scripts_pre_tokenizer_schema",
                 node=UnicodeScriptsPreTokenizerConfig,
-                group="pre_tokenizers")
+                group="tokenizer/pre_tokenizer")
     
     cs.store(name="whitespace_pre_tokenizer_schema",
                 node=WhitespacePreTokenizerConfig,
-                group="pre_tokenizers")
+                group="tokenizer/pre_tokenizer")
     
     cs.store(name="whitespace_split_pre_tokenizer_schema",
                 node=WhitespaceSplitPreTokenizerConfig,
-                group="pre_tokenizers")
+                group="tokenizer/pre_tokenizer")

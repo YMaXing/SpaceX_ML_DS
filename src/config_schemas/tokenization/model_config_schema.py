@@ -44,16 +44,16 @@ def setup_config() -> None:
 
     cs.store(name="bpe_model_schema", 
              node=BPEModelConfig, 
-             group="models")
+             group="tokenizer/model")
     
     cs.store(name="unigram_model_schema",
                 node=UnigramModelConfig,
-                group="models")
+                group="tokenizer/model")
     
     cs.store(name="word_level_model_schema",
                 node=WordLevelModelConfig,
-                group="models")
+                group="tokenizer/model")
     
     cs.store(name="word_piece_model_schema",
                 node=WordPieceModelConfig,
-                group="models")
+                group="tokenizer/model")

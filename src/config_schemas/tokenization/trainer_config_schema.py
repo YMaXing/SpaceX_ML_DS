@@ -31,7 +31,7 @@ class BpeTrainerConfig(TrainerConfig):
 class UnigramTrainerConfig(TrainerConfig):
     _target_: str = "tokenizers.trainers.UnigramTrainer"
     vocab_size: Optional[int] = 8000
-    initial_alphabet: list[str] = None
+    initial_alphabet: Optional[list[str]] = None
     shrinking_factor: float = 0.75
     unk_token: Optional[str] = SI("${tokenizer.unk_token}")
     max_piece_length: int = 16
@@ -55,10 +55,10 @@ def setup_config() -> None:
     
     cs.store(name="trainer_schema", node=TrainerConfig)
 
-    cs.store(name="bpe_trainer_schema", node=BpeTrainerConfig, group="trainers")
+    cs.store(name="bpe_trainer_schema", node=BpeTrainerConfig, group="tokenizer/trainer")
 
-    cs.store(name="unigram_trainer_schema", node=UnigramTrainerConfig, group="trainers")
+    cs.store(name="unigram_trainer_schema", node=UnigramTrainerConfig, group="tokenizer/trainer")
 
-    cs.store(name="word_level_trainer_schema", node=WordLevelTrainerConfig, group="trainers")
+    cs.store(name="word_level_trainer_schema", node=WordLevelTrainerConfig, group="tokenizer/trainer")
 
-    cs.store(name="word_piece_trainer_schema", node=WordPieceTrainerConfig, group="trainers")
+    cs.store(name="word_piece_trainer_schema", node=WordPieceTrainerConfig, group="tokenizer/trainer")

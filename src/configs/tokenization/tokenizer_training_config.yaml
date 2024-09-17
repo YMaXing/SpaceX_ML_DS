@@ -1,5 +1,0 @@
-defaults:
-  - tokenizer_training_schema
-
-data_parquet_path: gs://ymx-project-1-bucket-1/data/processed/.parquet
-text_column_name: cleaned_text
