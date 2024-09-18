@@ -2,15 +2,12 @@ import re
 import string
 
 from abc import ABC, abstractmethod
-from cgitb import text
 from dataclasses import dataclass
-from sys import flags
-from xmlrpc.client import Boolean
 
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
-from src.config_schemas.data_processing.data_processing_config_schema import Config
+from src.config_schemas.data_processing.data_processing_config_schema import DataProcessingConfig
 from src.utils.config_utils import get_config
 from src.utils.NLP_utils import SpellingCorrectionModel
 
@@ -101,7 +98,7 @@ class NonASCIIDatasetCleaner(DatasetCleaner):
 
 
 class XSpecificDatasetCleaner(DatasetCleaner):
-    def __init__(self, remove_emoji: Boolean) -> None:
+    def __init__(self, remove_emoji: bool) -> None:
         super().__init__()
         self.remove_emoji = remove_emoji
 

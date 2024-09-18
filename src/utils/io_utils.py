@@ -1,45 +1,56 @@
-from fsspec import AbstractFileSystem, filesystem
 from typing import Any
+
 import yaml
 
+from fsspec import AbstractFileSystem, filesystem
 
 GCS_PREFIX = "gs://"
-GCS_FILE_SYSTEM_NAME = "gcs" 
+GCS_FILE_SYSTEM_NAME = "gcs"
 LOCAL_FILE_SYSTEM_NAME = "file"
 TMP_FILE_PATH = "/tmp/"
+
 
 def choose_file_system(path: str) -> AbstractFileSystem:
     return filesystem(GCS_FILE_SYSTEM_NAME) if path.startswith(GCS_PREFIX) else filesystem(LOCAL_FILE_SYSTEM_NAME)
 
-def open_file(path: str, mode: str="r") -> Any:
+
+def open_file(path: str, mode: str = "r") -> Any:
     fs = choose_file_system(path)
     return fs.open(path, mode)
+
 
 def write_yaml(yaml_path: str, yaml_content: dict[Any, Any]) -> None:
     with open_file(yaml_path, "w") as f:
         yaml.dump(yaml_content, f)
 
+
 def is_dir(path: str) -> bool:
     fs = choose_file_system(path)
-    return fs.isdir(path)
+    result: bool = fs.isdir(path)
+    return result
+
 
 def is_file(path: str) -> bool:
     fs = choose_file_system(path)
-    return fs.isfile(path)
+    result: bool = fs.isfile(path)
+    return result
+
 
 def make_dirs(path: str) -> None:
     fs = choose_file_system(path)
     fs.makedirs(path, exist_ok=True)
 
+
 def list_paths(path: str) -> list[str]:
     fs = choose_file_system(path)
     if not is_dir(path):
         return []
-    paths = fs.ls(path)
+    paths: list[str] = fs.ls(path)
     if GCS_FILE_SYSTEM_NAME in fs.protocol:
-        gs_paths = [f"{GCS_PREFIX}{path}" for path in paths]
+        gs_paths: list[str] = [f"{GCS_PREFIX}{path}" for path in paths]
         return gs_paths
     return paths
+
 
 def copy_file(source_dir: str, target_dir: str) -> None:
     if not is_dir(target_dir):
@@ -53,4 +64,3 @@ def copy_file(source_dir: str, target_dir: str) -> None:
                 target.write(content)
         else:
             raise ValueError(f"{source_file} is not a file.")
-

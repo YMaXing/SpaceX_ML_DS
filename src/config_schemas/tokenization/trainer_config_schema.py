@@ -1,10 +1,10 @@
-from typing import Optional, Any
-from hydra.core.config_store import ConfigStore
-from pydantic.dataclasses import dataclass
-from pydantic import validator
 from dataclasses import field
-from omegaconf import MISSING, SI
+from typing import Any, Optional
 
+from hydra.core.config_store import ConfigStore
+from omegaconf import MISSING, SI
+from pydantic import validator
+from pydantic.dataclasses import dataclass
 
 
 @dataclass
@@ -13,19 +13,23 @@ class TrainerConfig:
     vocab_size: Optional[int] = None
     show_progress: bool = True
     min_frequency: int = 0
-    special_tokens: Optional[list[str]] = field(default_factory=lambda: [
-        SI("${tokenizer.unk_token}"),
-        SI("${tokenizer.pad_token}"),
-        SI("${tokenizer.cls_token}"),
-        SI("${tokenizer.sep_token}"),
-        SI("${tokenizer.mask_token}")
-    ])
+    special_tokens: Optional[list[str]] = field(
+        default_factory=lambda: [
+            SI("${tokenizer.unk_token}"),
+            SI("${tokenizer.pad_token}"),
+            SI("${tokenizer.cls_token}"),
+            SI("${tokenizer.sep_token}"),
+            SI("${tokenizer.mask_token}"),
+        ]
+    )
+
 
 @dataclass
 class BpeTrainerConfig(TrainerConfig):
     _target_: str = "tokenizers.trainers.BpeTrainer"
     vocab_size: int = 30000
     initial_alphabet: list[str] = field(default_factory=lambda: [])
+
 
 @dataclass
 class UnigramTrainerConfig(TrainerConfig):
@@ -37,9 +41,11 @@ class UnigramTrainerConfig(TrainerConfig):
     max_piece_length: int = 16
     n_sub_iterations: int = 2
 
+
 @dataclass
 class WordLevelTrainerConfig(TrainerConfig):
     _target_: str = "tokenizers.trainers.WordLevelTrainer"
+
 
 @dataclass
 class WordPieceTrainerConfig(TrainerConfig):
@@ -50,9 +56,10 @@ class WordPieceTrainerConfig(TrainerConfig):
     continuing_subword_prefix: Optional[str] = "##"
     end_of_word_suffix: Optional[str] = None
 
+
 def setup_config() -> None:
     cs = ConfigStore.instance()
-    
+
     cs.store(name="trainer_schema", node=TrainerConfig)
 
     cs.store(name="bpe_trainer_schema", node=BpeTrainerConfig, group="tokenizer/trainer")

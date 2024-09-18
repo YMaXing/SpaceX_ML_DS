@@ -1,12 +1,13 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
+from typing import Optional
 
 import dask.dataframe as dd
 import pandas as pd
-from dvc.api import get_url
-from typing import Optional 
 
-from src.utils.data_utils import repartition_dataframe, get_repo_url_with_access_token
+from dvc.api import get_url
+
+from src.utils.data_utils import get_repo_url_with_access_token, repartition_dataframe
 from src.utils.utils import get_logger
 
 
@@ -33,7 +34,9 @@ class DatasetReader(ABC):
         self.data_format = data_format
         self.use_dask = use_dask
         self.version = version
-        self.dvc_remote_repo = get_repo_url_with_access_token(gcp_project_id, gcp_github_access_token_secret_id, dvc_remote_repo, github_user_name)
+        self.dvc_remote_repo = get_repo_url_with_access_token(
+            gcp_project_id, gcp_github_access_token_secret_id, dvc_remote_repo, github_user_name
+        )
         self.logger = get_logger(self.__class__.__name__)
 
     def read_data(self) -> pd.DataFrame | dd.core.DataFrame:
@@ -63,7 +66,7 @@ class DatasetReader(ABC):
         The return value must be Pandas or Dask DataFrame(s) with required columns: self.required_columns.
         """
 
-    def assign_split_and_merge(self, df_train, df_val, df_test) -> pd.DataFrame | dd.core.DataFrame:
+    def assign_split_and_merge(self, df_train: pd.DataFrame | dd.core.DataFrame, df_val: pd.DataFrame | dd.core.DataFrame, df_test: pd.DataFrame | dd.core.DataFrame) -> pd.DataFrame | dd.core.DataFrame:
         df_train["split"] = "train"
         df_val["split"] = "val"
         df_test["split"] = "test"
@@ -73,9 +76,10 @@ class DatasetReader(ABC):
             else dd.concat([df_train, df_val, df_test], axis=0)
         )
         return df
-    
+
     def get_remote_data_url(self, dataset_path: str) -> str:
-        return get_url(path=dataset_path, repo=self.dvc_remote_repo, ref=self.version)
+        url: str = get_url(path=dataset_path, repo=self.dvc_remote_repo, ref=self.version)
+        return url
 
 
 class XDatasetReader(DatasetReader):
@@ -84,14 +88,14 @@ class XDatasetReader(DatasetReader):
         dataset_dir: str,
         dataset_name: str,
         required_columns: list[str],
-        split_names : list[str],
+        split_names: list[str],
         use_dask: bool,
         gcp_project_id: str,
         gcp_github_access_token_secret_id: str,
         dvc_remote_repo: str,
         github_user_name: str,
         version: str,
-        data_format: str = "csv"
+        data_format: str = "csv",
     ) -> None:
         super().__init__(
             dataset_dir=dataset_dir,
@@ -104,6 +108,7 @@ class XDatasetReader(DatasetReader):
             split_names=split_names,
             data_format=data_format,
             use_dask=use_dask,
+            gcp_project_id=gcp_project_id
         )
 
     def _read_data_pd(self) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
@@ -172,14 +177,20 @@ class XDatasetReader(DatasetReader):
 
 
 class DatasetReaderManager:
-    def __init__(self, dataset_readers: dict[str, DatasetReader], use_dask: bool, repartition: bool = True, available_memory: Optional[float] = None) -> None:
+    def __init__(
+        self,
+        dataset_readers: dict[str, DatasetReader],
+        use_dask: bool,
+        repartition: bool = True,
+        available_memory: Optional[float] = None,
+    ) -> None:
         self.dataset_readers = dataset_readers
         self.use_dask = use_dask
         self.repartition = repartition
-        self.available_memory = available_memory 
+        self.available_memory = available_memory
 
-    def read_data(self, num_worker: int):
+    def read_data(self, num_worker: int) -> pd.DataFrame | dd.core.DataFrame:
         dfs = [dataset_reader.read_data() for dataset_reader in self.dataset_readers.values()]
         if self.repartition:
-            df = repartition_dataframe(df, num_worker=num_worker, available_memory=self.available_memory)
+            dfs = repartition_dataframe(dfs, num_worker=num_worker, available_memory=self.available_memory)
         return pd.concat(dfs, axis=0) if not self.use_dask else dd.concat(dfs, axis=0)

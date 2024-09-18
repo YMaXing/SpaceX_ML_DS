@@ -6,9 +6,9 @@ from pydantic.dataclasses import dataclass
 
 @dataclass
 class GCP_Config:
-    project_id : str = "966043703721"
-    secret_id : str = "GCP-data-access-token"
-    zone : str = "us-west2-b"
+    project_id: str = "966043703721"
+    secret_id: str = "GCP-data-access-token"
+    zone: str = "us-west2-b"
     network: str = "default"
 
 

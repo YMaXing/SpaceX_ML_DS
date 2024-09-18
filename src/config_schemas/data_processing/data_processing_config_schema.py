@@ -1,10 +1,11 @@
 from dataclasses import dataclass, field
-from omegaconf import MISSING
+
 from hydra.core.config_store import ConfigStore
+from omegaconf import MISSING
 
 from src.config_schemas.data_processing import dataset_cleaners_config_schema, dataset_readers_config_schema
-from src.config_schemas.infrastructure import gcp_config_schema
 from src.config_schemas.data_processing.dask_cluster import dask_cluster_config_schema
+from src.config_schemas.infrastructure import gcp_config_schema
 
 
 @dataclass
@@ -29,6 +30,7 @@ class DataProcessingConfig:
     infrastructure: gcp_config_schema.GCP_Config = field(default_factory=gcp_config_schema.GCP_Config)
 
     use_dask: bool = False
+
 
 def setup_config() -> None:
     gcp_config_schema.setup_config()

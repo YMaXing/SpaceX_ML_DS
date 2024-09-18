@@ -1,13 +1,15 @@
 import string
+
 from dataclasses import dataclass, field
-from string import punctuation
 
 from hydra.core.config_store import ConfigStore
 from omegaconf import MISSING
 
+
 @dataclass
 class DatasetCleanerConfig:
     _target_: str = MISSING
+
 
 @dataclass
 class StopwordsDatasetCleanerConfig(DatasetCleanerConfig):
@@ -61,7 +63,7 @@ class SpellingCorrectionModelConfig:
 
 @dataclass
 class SpellingCorrectionDatasetCleanerConfig(DatasetCleanerConfig):
-    model: SpellingCorrectionModelConfig = field(default_factory=lambda: SpellingCorrectionModelConfig)
+    model: SpellingCorrectionModelConfig = field(default_factory=lambda: SpellingCorrectionModelConfig())
     _target_: str = "src.data_processing.NLP_process_data.SpellingCorrectionDatasetCleaner"
 
 
