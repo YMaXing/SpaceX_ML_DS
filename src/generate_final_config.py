@@ -1,10 +1,12 @@
 import argparse
-from typing import override
+
 from pathlib import Path
-from src.utils.config_utils import config_args_parser, compose_config, save_config_as_yaml, save_config_as_pickle
+from typing import override
+
+from src.utils.config_utils import compose_config, config_args_parser, save_config_as_pickle, save_config_as_yaml
 
 
-def generate_final_config(args:argparse.Namespace) -> None:
+def generate_final_config(args: argparse.Namespace) -> None:
     config_path = args.config_path
     config_name = args.config_name
     overrides = args.overrides
@@ -16,6 +18,7 @@ def generate_final_config(args:argparse.Namespace) -> None:
 
     save_config_as_yaml(config, str(config_save_dir / f"{config_name}.yaml"))
     save_config_as_pickle(config, str(config_save_dir / f"{config_name}.pickle"))
+
 
 if __name__ == "__main__":
     generate_final_config(config_args_parser())

@@ -46,15 +46,26 @@ generate-final-data-processing-config: up
 
 ## Generate final config for tokenizer training. Use OVERRIDES=<overrides> for overrides
 generate-final-tokenizer-training-config: up
-	$(DOCKER_COMPOSE_EXEC) python ./src/generate_final_config.py --config-name tokenizer_training_config --overrides docker_image_name=$(GCP_DOCKER_IMAGE_NAME) docker_image_tag=$(GCP_DOCKER_IMAGE_TAG) $${OVERRIDES}
+	$(DOCKER_COMPOSE_EXEC) python ./src/generate_final_config.py \
+	--config-path "../configs/tokenizer_training" \
+	--config-name tokenizer_training_config \
+	--overrides docker_image_name=$(GCP_DOCKER_IMAGE_NAME) docker_image_tag=$(GCP_DOCKER_IMAGE_TAG) $${OVERRIDES}
 
-## Prepare and process data, but not push to GCP artifact registry
+## Prepare and process data, and push the image to GCP artifact registry
+process-data: generate-final-data-processing-config GCP_image_push
+	$(DOCKER_COMPOSE_EXEC) python ./src/data_processing/process_data.py
+
+## Prepare and process data, but not push the image to GCP artifact registry
 local-process-data: generate-final-data-processing-config
 	$(DOCKER_COMPOSE_EXEC) python ./src/data_processing/process_data.py
 
-## Prepare and process data, and push to GCP artifact registry
-process-data: generate-final-data-processing-config GCP_image_push
-	$(DOCKER_COMPOSE_EXEC) python ./src/data_processing/process_data.py
+## Train tokenizer, and push the image to GCP artifact registry
+train-tokenizer: generate-final-tokenizer-training-config GCP_image_push
+	$(DOCKER_COMPOSE_EXEC) python ./src/tokenizer/train_tokenizer.py
+
+## Train tokenizer, but not push the image to GCP artifact registry
+local-train-tokenizer: generate-final-tokenizer-training-config
+	$(DOCKER_COMPOSE_EXEC) python ./src/tokenizer/train_tokenizer.py
 
 # Push docker image to GCP artifact registry
 GCP_image_push: build

@@ -1,16 +1,15 @@
 import string
 
-from cgitb import text
-from dataclasses import MISSING, field
-from string import punctuation
+from dataclasses import dataclass, field
 
 from hydra.core.config_store import ConfigStore
-from pydantic.dataclasses import dataclass
+from omegaconf import MISSING
 
 
 @dataclass
 class DatasetCleanerConfig:
     _target_: str = MISSING
+
 
 @dataclass
 class StopwordsDatasetCleanerConfig(DatasetCleanerConfig):
@@ -64,7 +63,7 @@ class SpellingCorrectionModelConfig:
 
 @dataclass
 class SpellingCorrectionDatasetCleanerConfig(DatasetCleanerConfig):
-    model: SpellingCorrectionModelConfig = field(default_factory=lambda: SpellingCorrectionModelConfig)
+    model: SpellingCorrectionModelConfig = field(default_factory=lambda: SpellingCorrectionModelConfig())
     _target_: str = "src.data_processing.NLP_process_data.SpellingCorrectionDatasetCleaner"
 
 

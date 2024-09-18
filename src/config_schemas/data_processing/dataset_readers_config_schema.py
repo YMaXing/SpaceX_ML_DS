@@ -1,9 +1,9 @@
-from dataclasses import dataclass, MISSING, field
-from omegaconf import SI
+from dataclasses import dataclass, field
+from typing import Optional
 
 from hydra.core.config_store import ConfigStore
-from pydantic.dataclasses import dataclass
-from typing import Optional
+from omegaconf import MISSING, SI
+
 
 @dataclass
 class DatasetReaderConfig:

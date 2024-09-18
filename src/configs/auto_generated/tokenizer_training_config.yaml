@@ -1,0 +1,41 @@
+docker_image_name: us-west2-docker.pkg.dev/YMaXing/spacex-ds-ml
+docker_image_tag: a8b518e4-a7a1-47a6-88b3-a6370efa93db
+data_parquet_path: gs://ymx-project-1-bucket-1/data/processed/rebalanced_splits/train.parquet
+text_column_name: cleaned_text
+tokenizer:
+  _target_: src.tokenization.tokenizer.HuggingFaceTokenizer
+  pre_tokenizer:
+    _target_: tokenizers.pre_tokenizers.Whitespace
+  trainer:
+    _target_: tokenizers.trainers.BpeTrainer
+    vocab_size: 30000
+    show_progress: true
+    min_frequency: 0
+    special_tokens:
+    - '[UNK]'
+    - '[PAD]'
+    - '[CLS]'
+    - '[SEP]'
+    - '[MASK]'
+    initial_alphabet: []
+  model:
+    _target_: tokenizers.models.BPE
+    vocab_size: null
+    merges: null
+    cache_capacity: 10000
+    dropout: null
+    unk_token: $(tokenizer.unk_token)
+    fuse_unk: false
+  normalizer: null
+  post_processor: null
+  decoder: null
+  unk_token: '[UNK]'
+  cls_token: '[CLS]'
+  sep_token: '[SEP]'
+  pad_token: '[PAD]'
+  mask_token: '[MASK]'
+infrastructure:
+  project_id: '966043703721'
+  secret_id: GCP-data-access-token
+  zone: us-west2-b
+  network: default
