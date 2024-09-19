@@ -1,24 +1,52 @@
+x-app-template: &APP_TEMPLATE
+  user: "${USER_ID:-1000}"
+  hostname: "${HOST_NAME:-YMaXing}"
+  image: spacex-ds-ml
+  platform: linux/amd64
+  container_name: spacex-ds-ml-container
+  environment:
+    - GOOGLE_APPLICATION_CREDENTIALS=./credentials/meta-sensor-434006-j6-19a2cb0d9661.json
+  build:
+    context: .
+    dockerfile: ./docker/Dockerfile
+    args:
+      USER_NAME: "${USER_NAME:-YMaXing}"
+      USER_ID: "${USER_ID:-1000}"
+  env_file: 
+    - .envs/.postgres
+    - .envs/.mlflow-common
+    - .envs/.mlflow-dev
+  volumes:
+    - ./:/app/
+    - mlflow-artifact-store:/mlflow-artifact-store  
+    - ~/.config/gcloud/:/home/${USER_NAME:-YMaXing}/.config/gcloud
+  ipc: host
+  init: true
+
+
+
 services:
-  app:
-    user: "${USER_ID:-1000}"
-    hostname: "${HOST_NAME:-YMaXing}"
-    image: spacex-ds-ml
-    platform: linux/amd64
-    container_name: spacex-ds-ml-container
-    environment:
-      - GOOGLE_APPLICATION_CREDENTIALS=./credentials/meta-sensor-434006-j6-19a2cb0d9661.json
-    build:
-      context: .
-      dockerfile: ./docker/Dockerfile
-      args:
-        USER_NAME: "${USER_NAME:-YMaXing}"
-        USER_ID: "${USER_ID:-1000}"
+  mlflow-db: 
+    container_name: mlflow-backend-store
+    image: postgres:14
+    env_file:
+      - .envs/.mlflow-common
+      - .envs/.mlflow-dev
+      - .envs/.postgres
     volumes:
-      - ./:/app/
-      - ~/.config/gcloud/:/home/${USER_NAME:-YMaXing}/.config/gcloud
+      - postgresql-mlflow-data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    profiles:
+      - dev
+  
+  app-dev: 
+    <<: *APP_TEMPLATE
+    container_name: spacex-ds-ml-dev-container
     ports:
       - 8888:8888
-
+      - 8080:8080
+      - ${LOCAL_DEV_MLFLOW_SERVER_PORT}:${LOCAL_DEV_MLFLOW_SERVER_PORT}
     deploy:
       resources:
         reservations:
@@ -26,7 +54,32 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-    ipc: host
-    init: true
+    profiles: 
+      - dev
+
+  app-prod:
+    <<: *APP_TEMPLATE
+    container_name: spacex-ds-ml-prod-container
+    ports:
+      - 8080:8080
+      - ${PROD_MLFLOW_SERVER_PORT}:${PROD_MLFLOW_SERVER_PORT}
+    env_file:
+      - .envs/.mlflow-common
+      - .envs/.mlflow-prod
+    profiles:
+      - prod
+    
+  app-ci:
+    <<: *APP_TEMPLATE
+    container_name: spacex-ds-ml-ci-container
+    ports:
+      - ${LOCAL_DEV_MLFLOW_SERVER_PORT}:${LOCAL_DEV_MLFLOW_SERVER_PORT}
+    profiles:
+      - ci
+
+
+volumes:
+  postgresql-mlflow-data:
+  mlflow-artifact-store:
 
 

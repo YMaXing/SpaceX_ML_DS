@@ -1,6 +1,11 @@
 # Make all targets .PHONY
 .PHONY: $(shell sed -n -e '/^$$/ { n ; /^[^ .\#][^ ]*:/ { s/:.*$$// ; p ; } ; }' $(MAKEFILE_LIST))
 
+include .envs/.postgres
+include .envs/.mlflow-common
+include .envs/.mlflow-dev
+export
+
 SHELL = /usr/bin/env bash
 USER_NAME = $(shell whoami)
 USER_ID = $(shell id -u)
@@ -12,12 +17,25 @@ else
 	DOCKER_COMPOSE_COMMAND = docker-compose
 endif
 
-SERVICE_NAME = app
-CONTAINER_NAME = spacex-ds-ml-container
+PROD_SERVICE_NAME = app-prod
+PROD_CONTAINER_NAME = spacex-ds-ml-prod-container
+
+ifeq (, $(shell which nvidia-smi))
+	PROFILE = ci
+	CONTAINER_NAME = spacex-ds-ml-ci-container
+	SERVICE_NAME = app-ci
+else
+	PROFILE = dev
+	CONTAINER_NAME = spacex-ds-ml-dev-container
+	SERVICE_NAME = app-dev
+endif
 
 DIRS_TO_VALIDATE = src test
 DOCKER_COMPOSE_RUN = $(DOCKER_COMPOSE_COMMAND) run --rm $(SERVICE_NAME)
 DOCKER_COMPOSE_EXEC = $(DOCKER_COMPOSE_COMMAND) exec $(SERVICE_NAME)
+
+DOCKER_COMPOSE_RUN_PROD = $(DOCKER_COMPOSE_COMMAND) run --rm $(PROD_SERVICE_NAME)
+DOCKER_COMPOSE_EXEC_PROD = $(DOCKER_COMPOSE_COMMAND) exec $(PROD_SERVICE_NAME)
 
 LOCAL_DOCKER_IMAGE_TAG = spacex-ds-ml
 GCP_DOCKER_IMAGE_NAME = us-west2-docker.pkg.dev/YMaXing/spacex-ds-ml
@@ -127,7 +145,12 @@ lock-dependencies: build-for-dependencies
 
 ## Starts docker containers using "docker-compose up -d"
 up:
-	$(DOCKER_COMPOSE_COMMAND) up -d
+	@if [ -z "$(shell docker ps -a | grep $(CONTAINER_NAME))" ]; then \
+		make down; \
+	fi
+	@$(DOCKER_COMPOSE_COMMAND) --profile $(PROFILE) up -d --remove-orphans
+
+
 
 ## docker-compose down
 down:
